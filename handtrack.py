@@ -18,6 +18,8 @@ mpDraw = mp.solutions.drawing_utils
 
 pTime = 0
 cTime = 0
+"""This is old code we don't need anymore 11/2/2024"""
+
 
 """We need to find a way to track the three main joints for each finger and abstract that information into our servo motors"""
 """https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker"""

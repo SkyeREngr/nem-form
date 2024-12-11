@@ -10,7 +10,7 @@ cap = cv2.VideoCapture(0)
 
 detector = HandDetector(detectionCon=0.8, maxHands=2)
 
-
+#fix this so it isnt a bunch of if statements
 def handPositionStrings(fingers):
     if fingers == [0, 0, 0, 0, 0]:
         return "Fist"
@@ -43,6 +43,8 @@ def handPositionStrings(fingers):
     else:
         return "No Gesture"
 
+
+
 while True:
     # reads image from camera
     success, img = cap.read()
@@ -63,28 +65,25 @@ while True:
         pTime = cTime
 
         cv2.putText(img, str(int(fps)), (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-        cv2.putText(img, str("Gesture"), (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+        cv2.putText(img, str("Gesture 1"), (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         cv2.putText(img, handPositionStrings(fingers1), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         #print(fingers1)
 
-        # if len(hands)==2:
-        #     hand2 = hands[1]
-        #     lmList2 = hand2["lmList"]
-        #     bbox2 = hand2["bbox"]
-        #     centerPoint2 = hand2["center"]
-        #     handType2 = hand2["type"]
-        #
-        #     fingers2 = detector.fingersUp(hand2)
-        #     print(fingers1, fingers2)
+        if len(hands)==2:
+            hand2 = hands[1]
+            lmList2 = hand2["lmList"]
+            bbox2 = hand2["bbox"]
+            centerPoint2 = hand2["center"]
+            handType2 = hand2["type"]
 
+            fingers2 = detector.fingersUp(hand2)
 
-    # cTime = time.time()
-    # fps = 1 / (cTime - pTime)
-    # pTime = cTime
-    #
-    # cv2.putText(img, str(int(fps)), (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-    # cv2.putText(img, str("Gesture"), (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-    # cv2.putText(img, handPositionStrings(fingers1), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+            cv2.putText(img, str(int(fps)), (150, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+            cv2.putText(img, str("Gesture 2"), (150, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+            cv2.putText(img, handPositionStrings(fingers2), (150, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255),2)
+
+            print(fingers1, fingers2)
+
 
     cv2.imshow("Image", img)
     cv2.waitKey(1)
