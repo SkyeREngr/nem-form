@@ -2,38 +2,65 @@ import time
 import cvzone
 from cvzone.HandTrackingModule import HandDetector
 import cv2
+import RPi.GPIO as GPIO
 from adafruit_motor import servo
-import board
-import pwmio
+
+# Set up GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 
 # Initialize PWM pins for servos (5 pins for each hand)
 # Hand 1 (First hand)
-thumb_pin1 = pwmio.PWMOut(board.D17, frequency=50)
-index_pin1 = pwmio.PWMOut(board.D27, frequency=50)
-middle_pin1 = pwmio.PWMOut(board.D22, frequency=50)
-ring_pin1 = pwmio.PWMOut(board.D5, frequency=50)
-pinky_pin1 = pwmio.PWMOut(board.D6, frequency=50)
+thumb_pin1 = 17
+index_pin1 = 27
+middle_pin1 = 22
+ring_pin1 = 5
+pinky_pin1 = 6
 
 # Hand 2 (Second hand)
-thumb_pin2 = pwmio.PWMOut(board.D18, frequency=50)
-index_pin2 = pwmio.PWMOut(board.D23, frequency=50)
-middle_pin2 = pwmio.PWMOut(board.D24, frequency=50)
-ring_pin2 = pwmio.PWMOut(board.D25, frequency=50)
-pinky_pin2 = pwmio.PWMOut(board.D4, frequency=50)
+thumb_pin2 = 18
+index_pin2 = 23
+middle_pin2 = 24
+ring_pin2 = 25
+pinky_pin2 = 4
 
-# Initialize Servo objects for Hand 1 (First hand)
-thumb_servo1 = servo.Servo(thumb_pin1)
-index_servo1 = servo.Servo(index_pin1)
-middle_servo1 = servo.Servo(middle_pin1)
-ring_servo1 = servo.Servo(ring_pin1)
-pinky_servo1 = servo.Servo(pinky_pin1)
+# Set up PWM for each pin
+GPIO.setup(thumb_pin1, GPIO.OUT)
+GPIO.setup(index_pin1, GPIO.OUT)
+GPIO.setup(middle_pin1, GPIO.OUT)
+GPIO.setup(ring_pin1, GPIO.OUT)
+GPIO.setup(pinky_pin1, GPIO.OUT)
 
-# Initialize Servo objects for Hand 2 (Second hand)
-thumb_servo2 = servo.Servo(thumb_pin2)
-index_servo2 = servo.Servo(index_pin2)
-middle_servo2 = servo.Servo(middle_pin2)
-ring_servo2 = servo.Servo(ring_pin2)
-pinky_servo2 = servo.Servo(pinky_pin2)
+GPIO.setup(thumb_pin2, GPIO.OUT)
+GPIO.setup(index_pin2, GPIO.OUT)
+GPIO.setup(middle_pin2, GPIO.OUT)
+GPIO.setup(ring_pin2, GPIO.OUT)
+GPIO.setup(pinky_pin2, GPIO.OUT)
+
+thumb_pwm1 = GPIO.PWM(thumb_pin1, 50)
+index_pwm1 = GPIO.PWM(index_pin1, 50)
+middle_pwm1 = GPIO.PWM(middle_pin1, 50)
+ring_pwm1 = GPIO.PWM(ring_pin1, 50)
+pinky_pwm1 = GPIO.PWM(pinky_pin1, 50)
+
+thumb_pwm2 = GPIO.PWM(thumb_pin2, 50)
+index_pwm2 = GPIO.PWM(index_pin2, 50)
+middle_pwm2 = GPIO.PWM(middle_pin2, 50)
+ring_pwm2 = GPIO.PWM(ring_pin2, 50)
+pinky_pwm2 = GPIO.PWM(pinky_pin2, 50)
+
+# Start PWM with initial duty cycle
+thumb_pwm1.start(0)
+index_pwm1.start(0)
+middle_pwm1.start(0)
+ring_pwm1.start(0)
+pinky_pwm1.start(0)
+
+thumb_pwm2.start(0)
+index_pwm2.start(0)
+middle_pwm2.start(0)
+ring_pwm2.start(0)
+pinky_pwm2.start(0)
 
 # Initialize variables
 servo_positions1 = [0, 0, 0, 0, 0]  # Store servo positions for Hand 1 (First hand)
@@ -42,19 +69,19 @@ servo_positions2 = [0, 0, 0, 0, 0]  # Store servo positions for Hand 2 (Second h
 # Function to update servos for both hands
 def update_servos(fingers1, fingers2=None):
     # Update servos for Hand 1 (First hand)
-    thumb_servo1.angle = 165 if fingers1[0] == 1 else 15
-    index_servo1.angle = 165 if fingers1[1] == 1 else 15
-    middle_servo1.angle = 165 if fingers1[2] == 1 else 15
-    ring_servo1.angle = 165 if fingers1[3] == 1 else 15
-    pinky_servo1.angle = 165 if fingers1[4] == 1 else 15
+    thumb_pwm1.ChangeDutyCycle(10 if fingers1[0] == 1 else 2)
+    index_pwm1.ChangeDutyCycle(10 if fingers1[1] == 1 else 2)
+    middle_pwm1.ChangeDutyCycle(10 if fingers1[2] == 1 else 2)
+    ring_pwm1.ChangeDutyCycle(10 if fingers1[3] == 1 else 2)
+    pinky_pwm1.ChangeDutyCycle(10 if fingers1[4] == 1 else 2)
 
     # If fingers2 (second hand) is provided, update servos for Hand 2 (Second hand)
     if fingers2:
-        thumb_servo2.angle = 165 if fingers2[0] == 1 else 15
-        index_servo2.angle = 165 if fingers2[1] == 1 else 15
-        middle_servo2.angle = 165 if fingers2[2] == 1 else 15
-        ring_servo2.angle = 165 if fingers2[3] == 1 else 15
-        pinky_servo2.angle = 165 if fingers2[4] == 1 else 15
+        thumb_pwm2.ChangeDutyCycle(10 if fingers2[0] == 1 else 2)
+        index_pwm2.ChangeDutyCycle(10 if fingers2[1] == 1 else 2)
+        middle_pwm2.ChangeDutyCycle(10 if fingers2[2] == 1 else 2)
+        ring_pwm2.ChangeDutyCycle(10 if fingers2[3] == 1 else 2)
+        pinky_pwm2.ChangeDutyCycle(10 if fingers2[4] == 1 else 2)
 
 # Open camera
 pTime = 0
