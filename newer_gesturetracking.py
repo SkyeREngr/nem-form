@@ -4,22 +4,22 @@ from cvzone.HandTrackingModule import HandDetector
 import cv2
 from adafruit_motor import servo
 import board
-import pulseio
+import pwmio
 
 # Initialize PWM pins for servos (5 pins for each hand)
 # Hand 1 (First hand)
-thumb_pin1 = pulseio.PWMOut(board.D17, frequency=50)
-index_pin1 = pulseio.PWMOut(board.D27, frequency=50)
-middle_pin1 = pulseio.PWMOut(board.D22, frequency=50)
-ring_pin1 = pulseio.PWMOut(board.D5, frequency=50)
-pinky_pin1 = pulseio.PWMOut(board.D6, frequency=50)
+thumb_pin1 = pwmio.PWMOut(board.D17, frequency=50)
+index_pin1 = pwmio.PWMOut(board.D27, frequency=50)
+middle_pin1 = pwmio.PWMOut(board.D22, frequency=50)
+ring_pin1 = pwmio.PWMOut(board.D5, frequency=50)
+pinky_pin1 = pwmio.PWMOut(board.D6, frequency=50)
 
 # Hand 2 (Second hand)
-thumb_pin2 = pulseio.PWMOut(board.D18, frequency=50)
-index_pin2 = pulseio.PWMOut(board.D23, frequency=50)
-middle_pin2 = pulseio.PWMOut(board.D24, frequency=50)
-ring_pin2 = pulseio.PWMOut(board.D25, frequency=50)
-pinky_pin2 = pulseio.PWMOut(board.D4, frequency=50)
+thumb_pin2 = pwmio.PWMOut(board.D18, frequency=50)
+index_pin2 = pwmio.PWMOut(board.D23, frequency=50)
+middle_pin2 = pwmio.PWMOut(board.D24, frequency=50)
+ring_pin2 = pwmio.PWMOut(board.D25, frequency=50)
+pinky_pin2 = pwmio.PWMOut(board.D4, frequency=50)
 
 # Initialize Servo objects for Hand 1 (First hand)
 thumb_servo1 = servo.Servo(thumb_pin1)
