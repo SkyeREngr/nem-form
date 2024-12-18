@@ -40,29 +40,20 @@ servo_positions1 = [0, 0, 0, 0, 0]  # Store servo positions for Hand 1 (First ha
 servo_positions2 = [0, 0, 0, 0, 0]  # Store servo positions for Hand 2 (Second hand)
 
 def update_servos(fingers1, fingers2=None):
-    def smoothMove(servo, target_angle, step=5, delay=0.05):
-        if servo.angle is None:
-            servo.angle = 15
-        current_angle = servo.angle
-        step = step if target_angle > current_angle else -step
+    # Set angles for Hand 1
+    thumb_servo1.angle = 165 if fingers1[0] == 1 else 15
+    index_servo1.angle = 165 if fingers1[1] == 1 else 15
+    middle_servo1.angle = 165 if fingers1[2] == 1 else 15
+    ring_servo1.angle = 165 if fingers1[3] == 1 else 15
+    pinky_servo1.angle = 165 if fingers1[4] == 1 else 15
 
-        for angle in range(int(current_angle), int(target_angle), step):
-            servo.angle = angle
-            time.sleep(delay)
-        servo.angle = target_angle
-
-    smoothMove(thumb_servo1, 165 if fingers1[0] == 1 else 15)
-    smoothMove(index_servo1, 165 if fingers1[1] == 1 else 15)
-    smoothMove(middle_servo1, 165 if fingers1[2] == 1 else 15)
-    smoothMove(ring_servo1, 165 if fingers1[3] == 1 else 15)
-    smoothMove(pinky_servo1, 165 if fingers1[4] == 1 else 15)
-
+    # Set angles for Hand 2 (if provided)
     if fingers2:
-        smoothMove(thumb_servo2, 165 if fingers2[0] == 1 else 15)
-        smoothMove(index_servo2, 165 if fingers2[1] == 1 else 15)
-        smoothMove(middle_servo2, 165 if fingers2[2] == 1 else 15)
-        smoothMove(ring_servo2, 165 if fingers2[3] == 1 else 15)
-        smoothMove(pinky_servo2, 165 if fingers2[4] == 1 else 15)
+        thumb_servo2.angle = 165 if fingers2[0] == 1 else 15
+        index_servo2.angle = 165 if fingers2[1] == 1 else 15
+        middle_servo2.angle = 165 if fingers2[2] == 1 else 15
+        ring_servo2.angle = 165 if fingers2[3] == 1 else 15
+        pinky_servo2.angle = 165 if fingers2[4] == 1 else 15
 
 
 # Open camera
