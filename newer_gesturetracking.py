@@ -1,38 +1,70 @@
+import time
 import cvzone
 from cvzone.HandTrackingModule import HandDetector
 import cv2
-import time
-import serial
+from adafruit_motor import servo
+import board
+import pwmio
 
-try:
-    ser = serial.Serial('COM8', 9600, timeout=1)
-    time.sleep(2)
-    print("Serial connection established on COM8")
-except Exception as e:
-    print(f"Error opening serial connection on COM8: {e}")
-    ser = None
+# Initialize PWM pins for servos (5 pins for each hand)
+# Hand 1 (First hand)
+thumb_pin1 = pwmio.PWMOut(board.D17, frequency=50)
+index_pin1 = pwmio.PWMOut(board.D27, frequency=50)
+middle_pin1 = pwmio.PWMOut(board.D22, frequency=50)
+ring_pin1 = pwmio.PWMOut(board.D5, frequency=50)
+pinky_pin1 = pwmio.PWMOut(board.D6, frequency=50)
 
-def sendData(fingers):
-    if ser is not None and ser.is_open:
-        #thumb value needs to be inverted for some reason
-        fingers[0] = 1 if fingers[0] == 0 else 0
-        #use CSV format for better parsing
-        string = ",".join([str(finger) for finger in fingers]) + "\n"
-        try:
-            ser.write(string.encode())  #send encoded string
-            print(f"Sent: {string.strip()}")  #remove newline
-        except Exception as e:
-            print(f"Error while sending data: {e}")
-    else:
-        print("Serial connection not open")
+# Hand 2 (Second hand)
+thumb_pin2 = pwmio.PWMOut(board.D18, frequency=50)
+index_pin2 = pwmio.PWMOut(board.D23, frequency=50)
+middle_pin2 = pwmio.PWMOut(board.D24, frequency=50)
+ring_pin2 = pwmio.PWMOut(board.D25, frequency=50)
+pinky_pin2 = pwmio.PWMOut(board.D4, frequency=50)
 
+# Initialize Servo objects for Hand 1 (First hand)
+thumb_servo1 = servo.Servo(thumb_pin1)
+index_servo1 = servo.Servo(index_pin1)
+middle_servo1 = servo.Servo(middle_pin1)
+ring_servo1 = servo.Servo(ring_pin1)
+pinky_servo1 = servo.Servo(pinky_pin1)
+
+# Initialize Servo objects for Hand 2 (Second hand)
+thumb_servo2 = servo.Servo(thumb_pin2)
+index_servo2 = servo.Servo(index_pin2)
+middle_servo2 = servo.Servo(middle_pin2)
+ring_servo2 = servo.Servo(ring_pin2)
+pinky_servo2 = servo.Servo(pinky_pin2)
+
+# Initialize variables
+servo_positions1 = [0, 0, 0, 0, 0]  # Store servo positions for Hand 1 (First hand)
+servo_positions2 = [0, 0, 0, 0, 0]  # Store servo positions for Hand 2 (Second hand)
+
+# Function to update servos for both hands
+def update_servos(fingers1, fingers2=None):
+    # Update servos for Hand 1 (First hand)
+    thumb_servo1.angle = 165 if fingers1[0] == 1 else 15
+    index_servo1.angle = 165 if fingers1[1] == 1 else 15
+    middle_servo1.angle = 165 if fingers1[2] == 1 else 15
+    ring_servo1.angle = 165 if fingers1[3] == 1 else 15
+    pinky_servo1.angle = 165 if fingers1[4] == 1 else 15
+
+    # If fingers2 (second hand) is provided, update servos for Hand 2 (Second hand)
+    if fingers2:
+        thumb_servo2.angle = 165 if fingers2[0] == 1 else 15
+        index_servo2.angle = 165 if fingers2[1] == 1 else 15
+        middle_servo2.angle = 165 if fingers2[2] == 1 else 15
+        ring_servo2.angle = 165 if fingers2[3] == 1 else 15
+        pinky_servo2.angle = 165 if fingers2[4] == 1 else 15
+
+# Open camera
 pTime = 0
 cTime = 0
 cap = cv2.VideoCapture(0)
 
+# Initialize hand detector
 detector = HandDetector(detectionCon=0.8, maxHands=2)
 
-#fix this so it isnt a bunch of if statements
+# Gesture classification function
 def handPositionStrings(fingers):
     if fingers == [0, 0, 0, 0, 0]:
         return "Fist"
@@ -65,10 +97,9 @@ def handPositionStrings(fingers):
     else:
         return "No Gesture"
 
-
-
+# Main loop
 while True:
-    # reads image from camera
+    # Reads image from camera
     success, img = cap.read()
     hands, img = detector.findHands(img)
 
@@ -80,19 +111,19 @@ while True:
         handType1 = hand1["type"]
 
         fingers1 = detector.fingersUp(hand1)
-        sendData(fingers1)
-        handPositionStrings(fingers1)
+        update_servos(fingers1)  # Update servos for hand 1
 
+        # Calculate FPS
         cTime = time.time()
         fps = 1 / (cTime - pTime)
         pTime = cTime
 
+        # Display FPS and gesture information on the image
         cv2.putText(img, str(int(fps)), (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         cv2.putText(img, str("Gesture 1"), (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         cv2.putText(img, handPositionStrings(fingers1), (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-        #print(fingers1)
 
-        if len(hands)==2:
+        if len(hands) == 2:
             hand2 = hands[1]
             lmList2 = hand2["lmList"]
             bbox2 = hand2["bbox"]
@@ -100,14 +131,12 @@ while True:
             handType2 = hand2["type"]
 
             fingers2 = detector.fingersUp(hand2)
-            sendData(fingers2)
+            update_servos(fingers1, fingers2)  # Update servos for hand 2
 
             cv2.putText(img, str(int(fps)), (150, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
             cv2.putText(img, str("Gesture 2"), (150, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-            cv2.putText(img, handPositionStrings(fingers2), (150, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255),2)
+            cv2.putText(img, handPositionStrings(fingers2), (150, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
-            print(fingers1, fingers2)
-
-
+    # Display image
     cv2.imshow("Image", img)
     cv2.waitKey(1)
